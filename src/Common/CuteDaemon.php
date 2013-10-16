@@ -57,13 +57,12 @@ Class CuteDaemon{
 			if($this->isTimeToWakeUp($task)){
 				try{
 					Daemon::log(Daemon::LOG_INFO,
-							'Call task to wake up: '. $task->getTaskFrom());
-					//TODO Need fork as child process. 
+							'Call task to wake up: '. $task->taskName);
 					$task->run(array($this, 'complete'));
 				} catch(Exception $e){
 					Daemon::log(Daemon::LOG_INFO,
 							'An exception was caught by running task  ' .
-							get_class($task) . "\nError Message: " .
+							$task->taskName . "\nError Message: " .
 							$e->getMessage());
 				}
 			}
@@ -73,11 +72,11 @@ Class CuteDaemon{
 	public function complete(BaseTask $task, array $output){
 		if(count($output) > 0){
 			Daemon::log(Daemon::LOG_INFO,
-					'Task ' . $task->getTaskFrom() . " exit with output: \n" .
+					'Task ' . $task->taskName . " exit with output: \n" .
 					print_r($output, TRUE));
 		} else {
 			Daemon::log(Daemon::LOG_INFO,
-					'Task ' . $task->getTaskFrom() . ' has run to the end ' .
+					'Task ' . $task->taskName . ' has run to the end ' .
 					'with nothing output.');
 		}
 	}

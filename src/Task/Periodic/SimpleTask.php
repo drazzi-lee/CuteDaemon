@@ -23,6 +23,8 @@ class SimpleTask extends BaseTask{
 			 * 2>&1 : This will cause the stderr ouput of a program to be
 			 * 			written to the same filedescriptor than stdout.
 			 * &>	: This will place every output of a program to a file. 
+			 *
+			 * @TODO Need to fork a child process.
 			 */
 			exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
 			$this->timesNeed--;
