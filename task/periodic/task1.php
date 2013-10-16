@@ -8,7 +8,7 @@ function run(){
 function write($message){
 	$now = date('[ c ]');
 	if(empty($destination))
-		$destination = date('y_m_d').'.log';
+		$destination = '/home/drazzi/Workspace/CuteDaemon/task/periodic/'.date('y_m_d').'.log';
 	if(is_file($destination) && floor(2097131) <= filesize($destination))
 		rename($destination, dirname($destination) . DIRECTORY_SEPARATOR 
 				. basename($destination) . '-' . time());

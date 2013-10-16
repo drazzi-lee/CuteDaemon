@@ -34,7 +34,7 @@ class SimpleTask extends BaseTask{
 		return $this->lastRun;
 	}
 
-	public function setLastRun($time = time()){
+	public function setLastRun($time){
 		$this->lastRun = $time;
 	}
 

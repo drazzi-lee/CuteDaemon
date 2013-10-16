@@ -28,7 +28,7 @@ Daemon::log(Daemon::LOG_INFO, 'Daemon: #' .
 	Daemon::getOption('appName') .
 	' spawned. Log will be written to '.
 	Daemon::getOption('logLocation'));
-//$path = Daemon::writeAutoRun();
+$path = Daemon::writeAutoRun();
 
 $cuteDaemon = new CuteDaemon();
 while(TRUE){

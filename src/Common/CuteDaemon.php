@@ -25,10 +25,10 @@ Class CuteDaemon{
 	 * @return void.
 	 */
 	public function attach(BaseTask $task){
-		if($task->period < self::$minPeriod){
-			$task->period = self::$minPeriod;
+		if($task->getPeriod() < self::$minPeriod){
+			$task->setPeriod(self::$minPeriod);
 		}
-		unset($task->lastRun);
+		$task->setLastRun(0);
 		$this->tasks[] = $task;
 	}#method end.
 
@@ -58,11 +58,11 @@ Class CuteDaemon{
 				try{
 					$task->setLastRun(time());
 					Daemon::log(Daemon::LOG_INFO,
-							'Call task to wake up: '. get_class($task));
+							'Call task to wake up: '. $task->getTaskFrom());
 					//TODO Need fork as child process. 
 					$task->run(array($this, 'complete'));
 					Daemon::log(Daemon::LOG_INFO,
-							'Task ' . get_class($task) . ' run to end');
+							'Task ' . $task->getTaskFrom() . ' run to end');
 				} catch(Exception $e){
 					Daemon::log(Daemon::LOG_INFO,
 							'An exception was caught by running task  ' .
