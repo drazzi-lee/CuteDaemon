@@ -39,6 +39,15 @@ class SimpleTask extends BaseTask{
 	}
 
 	public function prepared(){
-		return $this->setScript($this->taskFrom);
+		$this->setScript($this->taskFrom);
+		
+		$configFile = dirname(realpath($this->phpScript)).'/config.ini';
+		$taskFileName = basename($this->phpScript, '.php');
+
+		$config = parse_ini_file($configFile, TRUE);
+		if(isset($config[$taskFileName]['period'])
+			&& $config[$taskFileName]['period'] > 1){
+			$this->period = $config[$taskFileName]['period'];
+		}
 	}
 }
