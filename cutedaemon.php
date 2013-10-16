@@ -15,6 +15,7 @@ Daemon::setOptions(array(
     'authorEmail' => 'drazzi.lee@gmail.com',
     'sysMemoryLimit' => '1024M',
 	'usePEAR'	=> FALSE,
+	'logPhpErrors' => TRUE,
     //'appRunAsGID' => 1000,
     //'appRunAsUID' => 1000,
 ));
@@ -28,7 +29,7 @@ Daemon::log(Daemon::LOG_INFO, 'Daemon: #' .
 	Daemon::getOption('appName') .
 	' spawned. Log will be written to '.
 	Daemon::getOption('logLocation'));
-$path = Daemon::writeAutoRun();
+//$path = Daemon::writeAutoRun();
 
 $cuteDaemon = new CuteDaemon();
 while(TRUE){

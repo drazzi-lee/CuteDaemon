@@ -56,13 +56,10 @@ Class CuteDaemon{
 			//if it is time to run this task.
 			if($this->isTimeToWakeUp($task)){
 				try{
-					$task->setLastRun(time());
 					Daemon::log(Daemon::LOG_INFO,
 							'Call task to wake up: '. $task->getTaskFrom());
 					//TODO Need fork as child process. 
 					$task->run(array($this, 'complete'));
-					Daemon::log(Daemon::LOG_INFO,
-							'Task ' . $task->getTaskFrom() . ' run to end');
 				} catch(Exception $e){
 					Daemon::log(Daemon::LOG_INFO,
 							'An exception was caught by running task  ' .
@@ -72,6 +69,18 @@ Class CuteDaemon{
 			}
 		}
 	}#method end.
+
+	public function complete(BaseTask $task, array $output){
+		if(count($output) > 0){
+			Daemon::log(Daemon::LOG_INFO,
+					'Task ' . $task->getTaskFrom() . " exit with output: \n" .
+					print_r($output, TRUE));
+		} else {
+			Daemon::log(Daemon::LOG_INFO,
+					'Task ' . $task->getTaskFrom() . ' has run to the end ' .
+					'with nothing output.');
+		}
+	}
 
 	/**
 	 * Check whether it is the time to run the task.

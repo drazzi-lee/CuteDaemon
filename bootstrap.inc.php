@@ -20,7 +20,7 @@ define('ENVIRONMENT', 'development');
 define('CUTEDAEMON_ROOT', __DIR__);
 define('CUTEDAEMON_SRC', CUTEDAEMON_ROOT . DIRECTORY_SEPARATOR . 'src');
 
-define('CUTEDAEMON_PERIODIC_PATH', 'task/periodic/');
+define('CUTEDAEMON_PERIODIC_PATH', __DIR__ . '/task/periodic/');
 define('CUTEDAEMON_PERIODIC_NAMESPACE', 'Task\Periodic');
 
 function load($namespace){
