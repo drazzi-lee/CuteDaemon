@@ -13,9 +13,12 @@
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon\OS;
+
+use \PEAR_Exception;
 
 /**
- * A System_Daemon_OS driver for Windows
+ * An exception thrown by System_Daemon_OS when it encounters an unrecoverable error.
  *
  * @category  System
  * @package   System_Daemon
@@ -26,19 +29,7 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  * * 
  */
-class System_Daemon_OS_Windows extends System_Daemon_OS
+class Exception extends PEAR_Exception
 {
-    /**
-     * Determines wether this system is compatible with this OS
-     *
-     * @return boolean
-     */
-    public function isInstalled() 
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== "WIN") {
-            return false;
-        }
-        
-        return true;
-    }
+
 }

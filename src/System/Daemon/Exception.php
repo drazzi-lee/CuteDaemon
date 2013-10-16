@@ -13,9 +13,12 @@
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon;
+
+use \PEAR_Exception;
 
 /**
- * An exception thrown by System_Daemon_OS when it encounters an unrecoverable error.
+ * An exception thrown by System_Daemon when it encounters an unrecoverable error.
  *
  * @category  System
  * @package   System_Daemon
@@ -26,7 +29,7 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  * * 
  */
-class System_Daemon_OS_Exception extends PEAR_Exception
+class Exception extends PEAR_Exception
 {
 
 }

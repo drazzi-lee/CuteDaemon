@@ -13,6 +13,7 @@
  * @version   SVN: Release: $Id: OS.php 150 2008-09-05 22:06:05Z kevin $
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon;
 
 /**
  * Operating System focussed functionality.
@@ -26,7 +27,7 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  *
  */
-class System_Daemon_OS
+class OS
 {
     /**
      * Holds errors
@@ -77,9 +78,9 @@ class System_Daemon_OS
         clearstatcache();
 
         // Get ancestors
-        $ancs = System_Daemon_OS::_getAncestors($this);
+        $ancs = OS::_getAncestors($this);
         foreach ($ancs as $i=>$anc) {
-            $ancs[$i] = System_Daemon_OS::_getShortHand($anc);
+            $ancs[$i] = OS::_getShortHand($anc);
         }
 
         // Set OS Details
@@ -101,7 +102,7 @@ class System_Daemon_OS
     {
         $Drivers      = array();
         $driversValid = array();
-        $class_prefix = "System_Daemon_OS_";
+        $class_prefix = 'CuteDaemon\System\Daemon\OS\\';
 
         // Load all drivers
         $driver_dir = realpath(dirname(__FILE__)."/OS");
@@ -250,7 +251,7 @@ class System_Daemon_OS
         }
 
         if (!$dir) {
-            $try_dir = realpath(dirname(__FILE__).'/../../data');
+            $try_dir = realpath(CUTEDAEMON_ROOT.'/data');
             if (!is_dir($try_dir)) {
                 $tried_dirs[] = $try_dir;
             } else {
@@ -370,7 +371,6 @@ class System_Daemon_OS
      */
     public function getAutoRunScript($properties)
     {
-
         // All data in place?
         if (($template = $this->getAutoRunTemplate($properties)) === false) {
             return false;
@@ -464,7 +464,6 @@ class System_Daemon_OS
             return false;
         }
 
-
         return $path;
     }
 
@@ -544,7 +543,7 @@ class System_Daemon_OS
     protected static function _mostSpecific($classes)
     {
         $weights = array_map(
-            array("System_Daemon_OS", "_getAncestorCount"),
+            array("CuteDaemon\System\Daemon\OS", "_getAncestorCount"),
             $classes
         );
         arsort($weights);
@@ -553,7 +552,7 @@ class System_Daemon_OS
     }
 
     /**
-     * Extracts last part of a classname. e.g. System_Daemon_OS_Ubuntu -> Ubuntu
+     * Extracts last part of a classname. e.g. OS_Ubuntu -> Ubuntu
      *
      * @param string $class Full classname
      *
@@ -577,7 +576,7 @@ class System_Daemon_OS
      */
     protected function _getAncestorCount($class)
     {
-        return count(System_Daemon_OS::_getAncestors($class));
+        return count(OS::_getAncestors($class));
     }
 
     /**

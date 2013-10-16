@@ -13,9 +13,12 @@
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon\OS;
+
+use CuteDaemon\System\Daemon\OS;
 
 /**
- * A System_Daemon_OS driver for Linux based Operating Systems
+ * A System_Daemon_OS driver for Windows
  *
  * @category  System
  * @package   System_Daemon
@@ -26,43 +29,18 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  * * 
  */
-class System_Daemon_OS_Linux extends System_Daemon_OS
+class Windows extends OS
 {
     /**
-     * On Linux, a distro-specific version file is often telling us enough
-     *
-     * @var string
-     */
-    protected $_osVersionFile = "";
-    
-    /**
-     * Path to autoRun script
-     *
-     * @var string
-     */
-    protected $_autoRunDir = "/etc/init.d";
-    
-    
-    
-    /**
-     * Determines wether the system is compatible with this OS
+     * Determines wether this system is compatible with this OS
      *
      * @return boolean
      */
     public function isInstalled() 
     {
-        if (!stristr(PHP_OS, "Linux")) {
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== "WIN") {
             return false;
         }
-        
-        // Find out more specific
-        // This is used by extended classes that inherit
-        // this function
-        if ($this->_osVersionFile) {
-            if (!file_exists($this->_osVersionFile)) {
-                return false;
-            } 
-        } 
         
         return true;
     }

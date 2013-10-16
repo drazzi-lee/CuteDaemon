@@ -1,4 +1,6 @@
 <?php
+namespace CuteDaemon;
+
 Class CuteDaemon{
 	private $tasks = array();
 	private $currentTaskLine = array();
@@ -29,11 +31,11 @@ Class CuteDaemon{
 	public function notify(){
 		foreach($this->tasks as $task){
 			//if it is time to run this task.
-			if($this->isTimeToRun($task)){
+			if($this->isTimeToWakeUp($task)){
 				try{
 					$task->lastRun = time();
 					System_Daemon::log(System_Daemon::LOG_INFO,
-							'Call task to run: '. get_class($task));
+							'Call task to wake up: '. get_class($task));
 					//TODO Need fork as child process. 
 					$task->run(array($this, 'complete'));
 					System_Daemon::log(System_Daemon::LOG_INFO,
@@ -48,7 +50,7 @@ Class CuteDaemon{
 		}
 	}
 
-	private function isTimeToRun(Task $task){
+	private function isTimeToWakeUp(Task $task){
 		if(time() - $task->lastRun > $task->period){
 			return TRUE;
 		} else {

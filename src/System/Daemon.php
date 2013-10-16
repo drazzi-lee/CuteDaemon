@@ -2,25 +2,26 @@
 /* vim: set noai expandtab tabstop=4 softtabstop=4 shiftwidth=4: */
 
 /**
- * System_Daemon turns PHP-CLI scripts into daemons.
+ * Daemon turns PHP-CLI scripts into daemons.
  *
  * PHP version 5
  *
  * @category  System
- * @package   System_Daemon
+ * @package   Daemon
  * @author    Kevin van Zonneveld <kevin@vanzonneveld.net>
  * @copyright 2008 Kevin van Zonneveld (http://kevin.vanzonneveld.net)
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD Licence
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System;
 
-// Autoloader borrowed from PHP_CodeSniffer, see function for credits
-spl_autoload_register(array('System_Daemon', 'autoload'));
+use CuteDaemon\System\Daemon\Options;
+use CuteDaemon\System\Daemon\OS;
 
 /**
- * System_Daemon. Create daemons with practicle functions
- * like System_Daemon::start()
+ * Daemon. Create daemons with practicle functions
+ * like Daemon::start()
  *
  * Requires PHP build with --enable-cli --with-pcntl.
  * Only runs on *NIX systems, because Windows lacks of the pcntl ext.
@@ -28,7 +29,7 @@ spl_autoload_register(array('System_Daemon', 'autoload'));
  * PHP version 5
  *
  * @category  System
- * @package   System_Daemon
+ * @package   Daemon
  * @author    Kevin van Zonneveld <kevin@vanzonneveld.net>
  * @copyright 2008 Kevin van Zonneveld (http://kevin.vanzonneveld.net)
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD Licence
@@ -36,23 +37,23 @@ spl_autoload_register(array('System_Daemon', 'autoload'));
  * @link      http://trac.plutonia.nl/projects/system_daemon
  *
  */
-class System_Daemon
+class Daemon
 {
     // Make these corresponding with PEAR
     // Ensures compatibility while maintaining independency
 
     /**
-     * System is unusable (will throw a System_Daemon_Exception as well)
+     * System is unusable (will throw a Daemon_Exception as well)
      */
     const LOG_EMERG = 0;
 
     /**
-     * Immediate action required (will throw a System_Daemon_Exception as well)
+     * Immediate action required (will throw a Daemon_Exception as well)
      */
     const LOG_ALERT = 1;
 
     /**
-     * Critical conditions (will throw a System_Daemon_Exception as well)
+     * Critical conditions (will throw a Daemon_Exception as well)
      */
     const LOG_CRIT = 2;
 
@@ -186,14 +187,14 @@ class System_Daemon
             'type' => 'boolean|object',
             'default' => false,
             'punch' => 'Accepts a PEAR_Log instance to handle all logging',
-            'detail' => 'This will replace System_Daemon\'s own logging facility',
+            'detail' => 'This will replace Daemon\'s own logging facility',
             'required' => true,
         ),
         'useCustomLogHandler' => array(
             'type' => 'boolean|object',
             'default' => false,
             'punch' => 'Accepts any callable method to handle all logging',
-            'detail' => 'This will replace System_Daemon\'s own logging facility',
+            'detail' => 'This will replace Daemon\'s own logging facility',
             'required' => true,
         ),
 
@@ -386,42 +387,42 @@ class System_Daemon
      * @see setSigHandler()
      */
     static protected $_sigHandlers = array(
-        SIGHUP => array('System_Daemon', 'defaultSigHandler'),
-        SIGINT => array('System_Daemon', 'defaultSigHandler'),
-        SIGQUIT => array('System_Daemon', 'defaultSigHandler'),
-        SIGILL => array('System_Daemon', 'defaultSigHandler'),
-        SIGTRAP => array('System_Daemon', 'defaultSigHandler'),
-        SIGABRT => array('System_Daemon', 'defaultSigHandler'),
-        'SIGIOT' => array('System_Daemon', 'defaultSigHandler'),
-        SIGBUS => array('System_Daemon', 'defaultSigHandler'),
-        SIGFPE => array('System_Daemon', 'defaultSigHandler'),
-        SIGUSR1 => array('System_Daemon', 'defaultSigHandler'),
-        SIGSEGV => array('System_Daemon', 'defaultSigHandler'),
-        SIGUSR2 => array('System_Daemon', 'defaultSigHandler'),
+        SIGHUP => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGINT => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGQUIT => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGILL => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGTRAP => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGABRT => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIGIOT' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGBUS => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGFPE => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGUSR1 => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGSEGV => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGUSR2 => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
         SIGPIPE => SIG_IGN,
-        SIGALRM => array('System_Daemon', 'defaultSigHandler'),
-        SIGTERM => array('System_Daemon', 'defaultSigHandler'),
-        'SIGSTKFLT' => array('System_Daemon', 'defaultSigHandler'),
-        'SIGCLD' => array('System_Daemon', 'defaultSigHandler'),
-        'SIGCHLD' => array('System_Daemon', 'defaultSigHandler'),
-        SIGCONT => array('System_Daemon', 'defaultSigHandler'),
-        SIGTSTP => array('System_Daemon', 'defaultSigHandler'),
-        SIGTTIN => array('System_Daemon', 'defaultSigHandler'),
-        SIGTTOU => array('System_Daemon', 'defaultSigHandler'),
-        SIGURG => array('System_Daemon', 'defaultSigHandler'),
-        SIGXCPU => array('System_Daemon', 'defaultSigHandler'),
-        SIGXFSZ => array('System_Daemon', 'defaultSigHandler'),
-        SIGVTALRM => array('System_Daemon', 'defaultSigHandler'),
-        SIGPROF => array('System_Daemon', 'defaultSigHandler'),
-        SIGWINCH => array('System_Daemon', 'defaultSigHandler'),
-        'SIGPOLL' => array('System_Daemon', 'defaultSigHandler'),
-        SIGIO => array('System_Daemon', 'defaultSigHandler'),
-        'SIGPWR' => array('System_Daemon', 'defaultSigHandler'),
-        'SIGSYS' => array('System_Daemon', 'defaultSigHandler'),
-        SIGBABY => array('System_Daemon', 'defaultSigHandler'),
-        'SIG_BLOCK' => array('System_Daemon', 'defaultSigHandler'),
-        'SIG_UNBLOCK' => array('System_Daemon', 'defaultSigHandler'),
-        'SIG_SETMASK' => array('System_Daemon', 'defaultSigHandler'),
+        SIGALRM => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGTERM => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIGSTKFLT' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIGCLD' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIGCHLD' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGCONT => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGTSTP => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGTTIN => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGTTOU => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGURG => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGXCPU => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGXFSZ => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGVTALRM => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGPROF => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGWINCH => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIGPOLL' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGIO => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIGPWR' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIGSYS' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        SIGBABY => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIG_BLOCK' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIG_UNBLOCK' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
+        'SIG_SETMASK' => array('CuteDaemon\System\Daemon', 'defaultSigHandler'),
     );
 
 
@@ -521,7 +522,7 @@ class System_Daemon
         self::_optionsInit(true);
 
         if (self::opt('logPhpErrors')) {
-            set_error_handler(array('System_Daemon', 'phpErrors'), E_ALL);
+            set_error_handler(array('CuteDaemon\System\Daemon', 'phpErrors'), E_ALL);
         }
 
         // To run as a part of PEAR
@@ -538,9 +539,9 @@ class System_Daemon
                 trigger_error($msg, E_USER_ERROR);
             }
 
-            if (false === class_exists('System_Daemon_Exception', true)) {
+            if (false === class_exists('Daemon_Exception', true)) {
                 // PEAR_Exception is OK. PEAR was found already.
-                throw new PEAR_Exception('Class System_Daemon_Exception not found');
+                throw new PEAR_Exception('Class Daemon_Exception not found');
             }
         }
 
@@ -548,7 +549,7 @@ class System_Daemon
         if (!defined('SIGHUP')) {
             $msg = 'PHP is compiled without --enable-pcntl directive';
             if (self::opt('usePEAR')) {
-                throw new System_Daemon_Exception($msg);
+                throw new Daemon_Exception($msg);
             } else {
                 trigger_error($msg, E_USER_ERROR);
             }
@@ -558,7 +559,7 @@ class System_Daemon
         if ((php_sapi_name() !== 'cli')) {
             $msg = 'You can only create daemon from the command line (CLI-mode)';
             if (self::opt('usePEAR')) {
-                throw new System_Daemon_Exception($msg);
+                throw new Daemon_Exception($msg);
             } else {
                 trigger_error($msg, E_USER_ERROR);
             }
@@ -568,7 +569,7 @@ class System_Daemon
         if (!function_exists('posix_getpid')) {
             $msg = 'PHP is compiled without --enable-posix directive';
             if (self::opt('usePEAR')) {
-                throw new System_Daemon_Exception($msg);
+                throw new Daemon_Exception($msg);
             } else {
                 trigger_error($msg, E_USER_ERROR);
             }
@@ -589,7 +590,7 @@ class System_Daemon
 
             $msg = 'Crucial options are not set. Review log:';
             if (self::opt('usePEAR')) {
-                throw new System_Daemon_Exception($msg);
+                throw new Daemon_Exception($msg);
             } else {
                 trigger_error($msg, E_USER_ERROR);
             }
@@ -790,7 +791,7 @@ class System_Daemon
             return;
         }
 
-        // Map PHP error level to System_Daemon log level
+        // Map PHP error level to Daemon log level
         if (!isset(self::$_logPhpMapping[$errno][0])) {
             self::warning('Unknown PHP errorno: %s', $errno);
             $phpLvl = self::LOG_ERR;
@@ -870,7 +871,7 @@ class System_Daemon
     public static function emerg()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return false;
     }
 
@@ -882,7 +883,7 @@ class System_Daemon
     public static function alert()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return false;
     }
 
@@ -894,7 +895,7 @@ class System_Daemon
     public static function crit()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return false;
     }
 
@@ -906,7 +907,7 @@ class System_Daemon
     public static function err()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return false;
     }
 
@@ -918,7 +919,7 @@ class System_Daemon
     public static function warning()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return false;
     }
 
@@ -930,7 +931,7 @@ class System_Daemon
     public static function notice()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return true;
     }
 
@@ -942,7 +943,7 @@ class System_Daemon
     public static function info()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return true;
     }
 
@@ -954,7 +955,7 @@ class System_Daemon
     public static function debug()
     {
         $arguments = func_get_args(); array_unshift($arguments, __FUNCTION__);
-        call_user_func_array(array('System_Daemon', '_ilog'), $arguments);
+        call_user_func_array(array('CuteDaemon\System\Daemon', '_ilog'), $arguments);
         return true;
     }
 
@@ -1027,7 +1028,7 @@ class System_Daemon
      * @param string  $function What function the log record is from
      * @param integer $line     What code line the log record is from
      *
-     * @throws System_Daemon_Exception
+     * @throws Daemon_Exception
      * @return boolean
      * @see _logLevels
      * @see logLocation
@@ -1073,7 +1074,7 @@ class System_Daemon
         }
         if (false !== ($cb = self::opt('useCustomLogHandler'))) {
             if (!is_callable($cb)) {
-                throw new System_Daemon_Exception('Your "useCustomLogHandler" ' .
+                throw new Daemon_Exception('Your "useCustomLogHandler" ' .
                     ' is not callable');
             }
             call_user_func($cb, $str . $log_tail, $level);
@@ -1112,7 +1113,7 @@ class System_Daemon
         }
 
         if (!self::opt('logLocation')) {
-            throw new System_Daemon_Exception('Either use PEAR Log or specify '.
+            throw new Daemon_Exception('Either use PEAR Log or specify '.
                 'a logLocation');
         }
 
@@ -1615,7 +1616,7 @@ class System_Daemon
         }
 
         $pid = file_get_contents(
-            System_Daemon::getOption('appPidLocation')
+            Daemon::getOption('appPidLocation')
         );
         @unlink(self::opt('appPidLocation'));
 
@@ -1638,7 +1639,7 @@ class System_Daemon
     {
         // Create Option Object if nescessary
         if (!self::$_osObj) {
-            self::$_osObj = System_Daemon_OS::factory();
+            self::$_osObj = OS::factory();
         }
 
         // Still false? This was an error!
@@ -1658,7 +1659,7 @@ class System_Daemon
     {
         // Create Option Object if nescessary
         if (!self::$_optObj) {
-            self::$_optObj = new System_Daemon_Options(self::$_optionDefinitions);
+            self::$_optObj = new Options(self::$_optionDefinitions);
         }
 
         // Still false? This was an error!

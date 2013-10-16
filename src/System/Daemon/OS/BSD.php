@@ -13,6 +13,10 @@
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon\OS;
+
+use CuteDaemon\System\Daemon\OS;
+
 
 /**
  * A System_Daemon_OS driver for BSD
@@ -26,7 +30,7 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  * * 
  */
-class System_Daemon_OS_BSD extends System_Daemon_OS
+class BSD extends OS
 {
     /**
      * Template path

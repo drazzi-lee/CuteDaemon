@@ -13,9 +13,12 @@
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon\OS;
+
+use CuteDaemon\System\Daemon\OS\Debian;
 
 /**
- * A System_Daemon_OS driver for Debian based Operating Systems (including Ubuntu)
+ * A System_Daemon_OS driver for Ubuntu. Based on Debian
  *
  * @category  System
  * @package   System_Daemon
@@ -26,37 +29,13 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  * * 
  */
-class System_Daemon_OS_Debian extends System_Daemon_OS_Linux
+class Ubuntu extends Debian
 {
     /**
      * On Linux, a distro-specific version file is often telling us enough
      *
      * @var string
      */
-    protected $_osVersionFile = "/etc/debian_version";
-    
-    /**
-     * Template path
-     *
-     * @var string
-     */
-    protected $_autoRunTemplatePath = '#datadir#/template_Debian';
-
-    /**
-     * Replace the following keys with values to convert a template into
-     * a read autorun script
-     *
-     * @var array
-     */
-    protected $_autoRunTemplateReplace = array(
-        "@author_name@"  => "{PROPERTIES.authorName}",
-        "@author_email@" => "{PROPERTIES.authorEmail}",
-        '@name@'         => '{PROPERTIES.appName}',
-        '@desc@'         => '{PROPERTIES.appDescription}',
-        '@bin_file@'     => '{PROPERTIES.appDir}/{PROPERTIES.appExecutable}',
-        '@bin_name@'     => '{PROPERTIES.appExecutable}',
-        '@pid_file@'     => '{PROPERTIES.appPidLocation}',
-        '@chkconfig@'    => '{PROPERTIES.appChkConfig}',
-    );
+    protected $_osVersionFile = "/etc/lsb-release";
     
 }

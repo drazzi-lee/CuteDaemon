@@ -13,6 +13,7 @@
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon;
 
 /**
  * Mechanism for validating, getting and setting a predefined set of options.
@@ -26,7 +27,7 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  * 
  */
-class System_Daemon_Options
+class Options
 {
     /**
      * Keep track of active state for all Options

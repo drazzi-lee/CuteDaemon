@@ -13,6 +13,9 @@
  * @version   SVN: Release: $Id$
  * @link      http://trac.plutonia.nl/projects/system_daemon
  */
+namespace CuteDaemon\System\Daemon\OS;
+
+use CuteDaemon\System\Daemon\OS\Ubuntu;
 
 /**
  * A System_Daemon_OS driver for Arch Linux
@@ -26,7 +29,7 @@
  * @link      http://trac.plutonia.nl/projects/system_daemon
  * *
  */
-class System_Daemon_OS_Arch extends System_Daemon_OS_Ubuntu
+class Arch extends Ubuntu
 {
     /**
      * On Linux, a distro-specific version file is often telling us enough
