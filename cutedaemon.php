@@ -39,5 +39,5 @@ while(TRUE){
 	} catch(Exception $e){
 		Daemon::log(Daemon::LOG_INFO, '[ERROR]'. $e->getMessage());
 	}
-	sleep(1);
+	usleep(100000); //sleep 0.1 second.
 } 
