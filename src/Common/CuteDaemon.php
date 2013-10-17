@@ -88,7 +88,7 @@ Class CuteDaemon{
 	 * @return boolean.
 	 */
 	private function isTimeToWakeUp(BaseTask $task){
-		if(time() - $task->getLastRun() > $task->getPeriod()){
+		if(time() - $task->getLastRun() >= $task->getPeriod()){
 			return TRUE;
 		} else {
 			return FALSE;
