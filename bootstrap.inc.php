@@ -14,6 +14,10 @@ if(!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300){
 	die();
 }
 
+if(!ini_get('date.timezone')){
+	ini_set('date.timezone', 'Asia/Shanghai');
+}
+
 define('ENVIRONMENT', 'development');
 //define('ENVIRONMENT', 'production');
 
