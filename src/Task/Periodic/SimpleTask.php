@@ -13,29 +13,9 @@ use CuteDaemon\Task\BaseTask;
 class SimpleTask extends BaseTask{
 
 	/**
-	 * Run the task every period seconds
-	 */
-	private $period = 5;
-
-	/**
 	 * The php script, is the realpath normaly.
 	 */
 	private $phpScript;
-
-	/**
-	 * Last run time, Unix timestamp parse.
-	 */
-	private $lastRun = 0;
-
-	/**
-	 * Times need to run, -1 by default, will run on no times limit.
-	 */
-	private $timesNeed = -1;
-
-	/**
-	 * The task name, can be the same with the script file name.
-	 */
-	public $taskName;
 
 	/**
 	 * Flag whether the task is running.
@@ -46,9 +26,8 @@ class SimpleTask extends BaseTask{
 	 * Run the task, it will callback when it comes to end.
 	 */
 	public function run($callback = null){
-		if(($this->timesNeed > 0 || $this->timesNeed == -1) && !$this->isRunning){
+		if(!$this->isRunning){
 			$output = array();
-
 			$this->isRunning = TRUE;
 			/**
 			 * 2>&1 : This will cause the stderr ouput of a program to be
@@ -57,23 +36,23 @@ class SimpleTask extends BaseTask{
 			 *
 			 * @TODO Need to fork a child process.
 			 */
-			exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
-			$this->timesNeed--;
-			$this->lastRun = time();
+//			$pid = pcntl_fork();
+//			if($pid === -1){
+//				$output[] = 'Process could not be forked.';
+//			} else if($pid){
+//				$output[] = "Ending {$this->taskName}'s parent process.";
+//			} else {
+				exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
+//			}
+			if($this->timesNeed > 0){
+				$this->timesNeed--;
+			}
 			$this->isRunning = FALSE;	
 
 			if(is_callable($callback)){
 				call_user_func_array($callback, array($this, $output));
 			}
 		}
-	}
-
-	public function getPeriod(){
-		return $this->period;
-	}
-
-	public function setPeriod($period){
-		$this->period = $period;
 	}
 
 	public function getScript(){
@@ -84,28 +63,11 @@ class SimpleTask extends BaseTask{
 		$this->phpScript = $script;
 	}
 
-	public function getLastRun(){
-		return $this->lastRun;
-	}
-
-	public function setLastRun($time){
-		$this->lastRun = $time;
-	}
-
-	public function setTimesNeed($count){
-		if(!empty($count)){
-			$this->timesNeed = $count;
-		}
-	}
-
-	public function getTimesNeed(){
-		return $this->timesNeed;
-	}
-
 	/**
 	 * Perpare the script to run, initialize the settings from config.ini
 	 */
-	public function prepared(){
+	public function prepared($taskFile){
+		$this->setTaskFrom($taskFile);
 		$this->setScript($this->taskFrom);
 		
 		$configFile = dirname(realpath($this->phpScript)).'/config.ini';

@@ -30,6 +30,8 @@ Class CuteDaemon{
 		}
 		$task->setLastRun(0);
 		$this->tasks[] = $task;
+		Daemon::log(Daemon::LOG_INFO, 'Attach task '. $task->taskName .
+			" Task infor: \n" . print_r($task, TRUE));
 	}#method end.
 
 	/**
@@ -58,6 +60,7 @@ Class CuteDaemon{
 				try{
 					Daemon::log(Daemon::LOG_INFO,
 							'Call task to wake up: '. $task->taskName);
+					$task->setLastRun(time());
 					$task->run(array($this, 'complete'));
 				} catch(Exception $e){
 					Daemon::log(Daemon::LOG_INFO,
@@ -88,7 +91,8 @@ Class CuteDaemon{
 	 * @return boolean.
 	 */
 	private function isTimeToWakeUp(BaseTask $task){
-		if(time() - $task->getLastRun() >= $task->getPeriod()){
+		if(($task->getTimesNeed() > 0 || $task->getTimesNeed() === -1)
+			&& time() - $task->getLastRun() >= $task->getPeriod()){
 			return TRUE;
 		} else {
 			return FALSE;
@@ -107,8 +111,7 @@ Class CuteDaemon{
 		foreach($currentTaskFiles as $taskFile){
 			if(is_file($taskFile) && !$this->isTaskAttached($taskFile)){
 				$simpleTask = new SimpleTask();
-				$simpleTask->setTaskFrom($taskFile);
-				$simpleTask->prepared();
+				$simpleTask->prepared($taskFile);
 				$this->attach($simpleTask);
 				$this->currentTaskLine[] = $taskFile;
 			}
