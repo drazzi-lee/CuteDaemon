@@ -62,6 +62,7 @@ Class CuteDaemon{
 							'Call task to wake up: '. $task->taskName);
 					$task->setLastRun(time());
 					$task->run(array($this, 'complete'));
+					$task->countDownTimesNeed();
 				} catch(Exception $e){
 					Daemon::log(Daemon::LOG_INFO,
 							'An exception was caught by running task  ' .
@@ -82,6 +83,7 @@ Class CuteDaemon{
 					'Task ' . $task->taskName . ' has run to the end ' .
 					'with nothing output.');
 		}
+		exit();
 	}
 
 	/**

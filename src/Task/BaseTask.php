@@ -60,4 +60,10 @@ abstract class BaseTask{
 	public function getTimesNeed(){
 		return $this->timesNeed;
 	}
+
+	public function countDownTimesNeed(){
+		if($this->timesNeed > 0){
+			$this->timesNeed--;
+		}
+	}
 }

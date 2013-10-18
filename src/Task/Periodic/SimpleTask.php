@@ -3,6 +3,7 @@
 namespace CuteDaemon\Task\Periodic;
 
 use CuteDaemon\Task\BaseTask;
+use CuteDaemon\System\Daemon;
 
 /**
  * SimpleTask, the task is only run the php script simply without any other
@@ -27,8 +28,6 @@ class SimpleTask extends BaseTask{
 	 */
 	public function run($callback = null){
 		if(!$this->isRunning){
-			$output = array();
-			$this->isRunning = TRUE;
 			/**
 			 * 2>&1 : This will cause the stderr ouput of a program to be
 			 * 			written to the same filedescriptor than stdout.
@@ -36,21 +35,28 @@ class SimpleTask extends BaseTask{
 			 *
 			 * @TODO Need to fork a child process.
 			 */
-//			$pid = pcntl_fork();
-//			if($pid === -1){
-//				$output[] = 'Process could not be forked.';
-//			} else if($pid){
-//				$output[] = "Ending {$this->taskName}'s parent process.";
-//			} else {
-				exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
-//			}
-			if($this->timesNeed > 0){
-				$this->timesNeed--;
-			}
-			$this->isRunning = FALSE;	
+			$pid = pcntl_fork();
+			if($pid === -1){
+				//'Process could not be forked.';
+				Daemon::Log(Daemon::LOG_INFO, "----------|>\n");
+				throw new Exception($this->taskName.'Process could not be forked ');
+			} else if($pid){
+				//Parent return.
+				Daemon::Log(Daemon::LOG_INFO, "[{$this->taskName}] parent process end.\n");
+				return TRUE;			
+			} else {
+				$output = array();
 
-			if(is_callable($callback)){
-				call_user_func_array($callback, array($this, $output));
+				$this->isRunning = TRUE;
+  				exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
+				$this->isRunning = FALSE;	
+
+				Daemon::Log(Daemon::LOG_INFO, "[{$this->taskName}] child process end.\n");
+				$this->isRunning = FALSE;	
+
+				if(is_callable($callback)){
+					call_user_func_array($callback, array($this, $output));
+				}
 			}
 		}
 	}

@@ -1,9 +1,5 @@
 <?php
 
-function run(){
-	$this->write("Running.\n");
-}
-
 
 function write($message){
 	$now = date('[ c ]');
