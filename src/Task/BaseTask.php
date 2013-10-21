@@ -2,23 +2,25 @@
 
 namespace CuteDaemon\Task;
 
+use CuteDaemon\System\Daemon;
+
 abstract class BaseTask{
 	/**
 	 * The task name, can be the same with the script file name.
 	 */
 	public $taskName;
 
-	/**
-	 * Run the task every period seconds
-	 */
-	protected $period = 5;
-
-	/**
-	 * Times need to run, -1 by default, will run on no times limit.
-	 */
-	protected $timesNeed = -1;
-
 	protected $taskFrom;
+
+	/**
+	 * The php script, is the realpath normaly.
+	 */
+	protected $phpScript;
+
+	/**
+	 * Flag whether the task is running.
+	 */
+	protected $isRunning = FALSE;
 
 	/**
 	 * Last run time, Unix timestamp parse.
@@ -33,37 +35,68 @@ abstract class BaseTask{
 		return $this->taskFrom;
 	}
 
-	public function getLastRun(){
-		return $this->lastRun;
+	protected function setScript($script){
+		$this->phpScript = $script;
 	}
 
-	public function setLastRun($time){
-		if($this->lastRun < $time){
-			$this->lastRun = $time;
-		}
+	public function getScript(){
+		return $this->phpScript;
 	}
 
-	public function getPeriod(){
-		return $this->period;
-	}
+	/**
+	 * Check whether it is the time to run the task.
+	 *
+	 * @return boolean.
+	 */
+	abstract public function isTimeToWakeUp();
 
-	protected function setPeriod($period){
-		$this->period = $period;
-	}
+	/**
+	 * After the run method was called, what to do next.
+	 * Like count down the times need. set lastRun..etc.
+	 */
+	abstract public function afterRun();
 
-	protected function setTimesNeed($count){
-		if(!empty($count)){
-			$this->timesNeed = $count;
-		}
-	}
+	/**
+	 * Read setttings from the config.ini, prepared the script
+	 * to run.
+	 */
+	abstract public function initialize($taskFile);
 
-	public function getTimesNeed(){
-		return $this->timesNeed;
-	}
+	/**
+	 * Run the task, it will callback when it comes to end.
+	 */
+	public function run($callback = null){
+		if(!$this->isRunning){
+			/**
+			 * 2>&1 : This will cause the stderr ouput of a program to be
+			 * 			written to the same filedescriptor than stdout.
+			 * &>	: This will place every output of a program to a file. 
+			 *
+			 * @TODO Need to fork a child process.
+			 */
+			$this->lastRun = time();
+			$pid = pcntl_fork();
+			if($pid === -1){
+				//'Process could not be forked.';
+				Daemon::Log(Daemon::LOG_INFO, "[{$this->taskName}] Process could not be forked.");
+			} else if($pid){
+				//Parent return.
+				Daemon::Log(Daemon::LOG_INFO, "[{$this->taskName}] parent process end.\n");
+				return TRUE;			
+			} else {
+				$output = array();
 
-	public function countDownTimesNeed(){
-		if($this->timesNeed > 0){
-			$this->timesNeed--;
+				$this->isRunning = TRUE;
+  				exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
+				$this->isRunning = FALSE;	
+
+				Daemon::Log(Daemon::LOG_INFO, "[{$this->taskName}] child process end.\n");
+				$this->isRunning = FALSE;	
+
+				if(is_callable($callback)){
+					call_user_func_array($callback, array($this, $output));
+				}
+			}
 		}
 	}
 }

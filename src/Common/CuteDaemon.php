@@ -3,19 +3,20 @@ namespace CuteDaemon\Common;
 
 use CuteDaemon\System\Daemon;
 use CuteDaemon\Task\BaseTask;
-use CuteDaemon\Task\Periodic\SimpleTask;
+use CuteDaemon\Task\Periodic\RepetitiveTask;
+use CuteDaemon\Task\Periodic\DailyTask;
 
 Class CuteDaemon{
 	private $tasks = array();
 	private $currentTaskLine = array();
 	private static $minPeriod;
-	private static $namespacePeriodic;
-	private static $periodicDirectory;
+	private static $repetitiveTaskDirectory;
+	private static $dailyTaskDirectory;
 
 	public function __construct(){
 		self::$minPeriod = 1;
-		self::$namespacePeriodic = CUTEDAEMON_PERIODIC_NAMESPACE;
-		self::$periodicDirectory = CUTEDAEMON_PERIODIC_PATH;
+		self::$repetitiveTaskDirectory = TASK_REPETITIVE_PATH;
+		self::$dailyTaskDirectory = TASK_DAILY_PATH;
 	}
 
 	/**
@@ -25,10 +26,6 @@ Class CuteDaemon{
 	 * @return void.
 	 */
 	public function attach(BaseTask $task){
-		if($task->getPeriod() < self::$minPeriod){
-			$task->setPeriod(self::$minPeriod);
-		}
-		$task->setLastRun(0);
 		$this->tasks[] = $task;
 		Daemon::log(Daemon::LOG_INFO, 'Attach task '. $task->taskName .
 			" Task infor: \n" . print_r($task, TRUE));
@@ -44,6 +41,7 @@ Class CuteDaemon{
 		foreach($this->tasks as $tkey => $tval){
 			if($tval == $task){
 				unset($this->tasks[$tkey]);
+				Daemon::log(Daemon::LOG_INFO, 'Detach task '.$task->taskName);
 			}
 		}
 	}#method end.
@@ -56,13 +54,12 @@ Class CuteDaemon{
 	public function notify(){
 		foreach($this->tasks as $task){
 			//if it is time to run this task.
-			if($this->isTimeToWakeUp($task)){
+			if($task->isTimeToWakeUp()){
 				try{
 					Daemon::log(Daemon::LOG_INFO,
 							'Call task to wake up: '. $task->taskName);
-					$task->setLastRun(time());
 					$task->run(array($this, 'complete'));
-					$task->countDownTimesNeed();
+					$task->afterRun();
 				} catch(Exception $e){
 					Daemon::log(Daemon::LOG_INFO,
 							'An exception was caught by running task  ' .
@@ -73,6 +70,9 @@ Class CuteDaemon{
 		}
 	}#method end.
 
+	/**
+	 * When the task runs to an end, logging its output.
+	 */
 	public function complete(BaseTask $task, array $output){
 		if(count($output) > 0){
 			Daemon::log(Daemon::LOG_INFO,
@@ -87,40 +87,36 @@ Class CuteDaemon{
 	}
 
 	/**
-	 * Check whether it is the time to run the task.
-	 *
-	 * @param BaseTask $task:
-	 * @return boolean.
-	 */
-	private function isTimeToWakeUp(BaseTask $task){
-		if(($task->getTimesNeed() > 0 || $task->getTimesNeed() === -1)
-			&& time() - $task->getLastRun() >= $task->getPeriod()){
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	}#method end.
-
-	/**
-	 * Update task by files in periodic directory. 
+	 * Update tasks by files in task directory. 
 	 *
 	 * @return void.
 	 */
 	public function updateTasks(){
-		$currentTaskFiles = glob(self::$periodicDirectory . '*.php');
+		$currentDailyTaskFiles = glob(self::$dailyTaskDirectory . '*.php');
+		$currentRepetitiveTaskFiles = glob(self::$repetitiveTaskDirectory . '*.php');
 
-		//Add new tasks.
-		foreach($currentTaskFiles as $taskFile){
+
+		//Add new simple periodic tasks.
+		foreach($currentRepetitiveTaskFiles as $taskFile){
 			if(is_file($taskFile) && !$this->isTaskAttached($taskFile)){
-				$simpleTask = new SimpleTask();
-				$simpleTask->prepared($taskFile);
-				$this->attach($simpleTask);
+				$repetitiveTask = new RepetitiveTask();
+				$repetitiveTask->initialize($taskFile);
+				$this->attach($repetitiveTask);
+				$this->currentTaskLine[] = $taskFile;
+			}
+		}
+		//Add new simple periodic tasks.
+		foreach($currentDailyTaskFiles as $taskFile){
+			if(is_file($taskFile) && !$this->isTaskAttached($taskFile)){
+				$dailyTask = new DailyTask();
+				$dailyTask->initialize($taskFile);
+				$this->attach($dailyTask);
 				$this->currentTaskLine[] = $taskFile;
 			}
 		}
 
 		//Remove expired tasks.
-		$taskFileRemoved = array_diff($this->currentTaskLine, $currentTaskFiles);
+		$taskFileRemoved = array_diff($this->currentTaskLine, array_merge($currentDailyTaskFiles, $currentRepetitiveTaskFiles));
 		foreach($taskFileRemoved as $taskFile){
 			foreach($this->tasks as $attachedTask){
 				if($attachedTask->getTaskFrom() == $taskFile){
@@ -129,7 +125,7 @@ Class CuteDaemon{
 			}
 		}
 	}#method end.
-
+	
 	/**
 	 * Check is the task has attached already.
 	 *

@@ -24,8 +24,8 @@ define('ENVIRONMENT', 'development');
 define('CUTEDAEMON_ROOT', __DIR__);
 define('CUTEDAEMON_SRC', CUTEDAEMON_ROOT . DIRECTORY_SEPARATOR . 'src');
 
-define('CUTEDAEMON_PERIODIC_PATH', __DIR__ . '/task/periodic/');
-define('CUTEDAEMON_PERIODIC_NAMESPACE', 'Task\Periodic');
+define('TASK_DAILY_PATH', __DIR__ . '/task/periodic/daily/');
+define('TASK_REPETITIVE_PATH', __DIR__ . '/task/periodic/repetitive/');
 
 function load($namespace){
 	$splitpath = explode('\\', $namespace);
