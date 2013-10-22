@@ -1,6 +1,5 @@
 #!/usr/bin/php -q
 <?php
-
 require_once 'bootstrap.inc.php';
 
 error_reporting(E_ALL);
@@ -22,22 +21,49 @@ Daemon::setOptions(array(
 Daemon::setOption('usePEAR', FALSE);
 Daemon::setOption('appName', 'cutedaemon');
 Daemon::setOption('appDir', dirname(__FILE__));
-Daemon::log(Daemon::LOG_INFO, 'CuteDaemon will start soon.');
 
-Daemon::start();
-Daemon::log(Daemon::LOG_INFO, 'Daemon: #' .
-	Daemon::getOption('appName') .
-	' spawned. Log will be written to '.
-	Daemon::getOption('logLocation'));
-//$path = Daemon::writeAutoRun();
+Daemon::setSigHandler(SIGTERM, 'myHandler');
 
-$cuteDaemon = new CuteDaemon();
-while(TRUE){
-	try{
-		$cuteDaemon->updateTasks();
-		$cuteDaemon->notify();
-	} catch(Exception $e){
-		Daemon::log(Daemon::LOG_INFO, '[ERROR]'. $e->getMessage());
-	}
-	usleep(100000); //sleep 0.1 second.
-} 
+function myHandler($signal) {
+    if ($signal === SIGTERM) {
+        Daemon::warning('Received the termination signal. ' . $signal);
+        // Execute some final code
+        // and be sure to:
+        Daemon::stop();
+    }
+}
+
+if(!isset($argv[1]) || !in_array($argv[1], array('-s','-d'))){
+	print("CuteDaemon, a daemon process as a notifier for wake up tasks written by php.\n");
+	print("Usage:\n");
+	print("		-s Write to /etc/init.d/ as a service.\n");
+	print("		-d Run cutedaemon as a daemon.\n");
+	print("See: https://github.com/drazzi-lee/CuteDaemon\n");
+}
+
+if(isset($argv[1]) && $argv[1] === '-s'){
+	$path = Daemon::writeAutoRun();
+	print("CuteDaemon was written as a service, you may need type:\n");
+	print("		sudo service cutedaemon start\n");
+	exit();
+}
+
+if(isset($argv[1]) && $argv[1] === '-d'){
+	Daemon::log(Daemon::LOG_INFO, 'CuteDaemon will start soon.');
+	Daemon::start();
+	Daemon::log(Daemon::LOG_INFO, 'Daemon: #' .
+		Daemon::getOption('appName') .
+		' spawned. Log will be written to '.
+		Daemon::getOption('logLocation'));
+
+	$cuteDaemon = new CuteDaemon();
+	while(!Daemon::isDying()){
+		try{
+			$cuteDaemon->updateTasks();
+			$cuteDaemon->notify();
+		} catch(Exception $e){
+			Daemon::log(Daemon::LOG_INFO, '[ERROR]'. $e->getMessage());
+		}
+		usleep(500000); //sleep 0.5 second.
+	} 
+}
