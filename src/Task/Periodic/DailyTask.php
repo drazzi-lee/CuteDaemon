@@ -73,13 +73,13 @@ class DailyTask extends BaseTask{
 		}
 		if(in_array('AllMonth', $repeats)){
 			$repeats = array_merge(
-					array_diff($repeats, self::$validMonth),
+					array_diff($repeats, array('AllMonth')),
 					self::$validMonth
 					);
 		}
 		if(in_array('AllWeek', $repeats)){
 			$repeats = array_merge(
-					array_diff($repeats, self::$validWeek),
+					array_diff($repeats, array('AllWeek')),
 					self::$validWeek
 					);
 		}
