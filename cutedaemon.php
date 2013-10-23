@@ -33,6 +33,9 @@ function myHandler($signal) {
     }
 }
 
+/**
+ * Only support args -d, -s, otherwise display helps.
+ */
 if(!isset($argv[1]) || !in_array($argv[1], array('-s','-d'))){
 	print("CuteDaemon, a daemon process as a notifier for wake up tasks written by php.\n");
 	print("Usage:\n");
@@ -41,13 +44,19 @@ if(!isset($argv[1]) || !in_array($argv[1], array('-s','-d'))){
 	print("See: https://github.com/drazzi-lee/CuteDaemon\n");
 }
 
+/**
+ * Write auto run to /etc/init.d/ as a service.
+ */
 if(isset($argv[1]) && $argv[1] === '-s'){
-	$path = Daemon::writeAutoRun();
+	$path = Daemon::writeAutoRun(TRUE);
 	print("CuteDaemon was written as a service, you may need type:\n");
 	print("		sudo service cutedaemon start\n");
 	exit();
 }
 
+/**
+ * Run script as a daemon.
+ */
 if(isset($argv[1]) && $argv[1] === '-d'){
 	Daemon::log(Daemon::LOG_INFO, 'CuteDaemon will start soon.');
 	Daemon::start();
