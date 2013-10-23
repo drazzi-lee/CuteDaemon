@@ -574,7 +574,7 @@ class OS
      *
      * @return integer
      */
-    protected function _getAncestorCount($class)
+    protected static function _getAncestorCount($class)
     {
         return count(OS::_getAncestors($class));
     }
@@ -586,7 +586,7 @@ class OS
      *
      * @return array
      */
-    protected function _getAncestors($class)
+    protected static function _getAncestors($class)
     {
         $classes = array();
         while ($class = get_parent_class($class)) {
