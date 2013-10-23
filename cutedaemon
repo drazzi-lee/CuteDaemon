@@ -1,6 +1,6 @@
 #!/usr/bin/php -q
 <?php
-require_once 'bootstrap.inc.php';
+require_once './data/bootstrap.inc.php';
 
 error_reporting(E_ALL);
 use CuteDaemon\System\Daemon;

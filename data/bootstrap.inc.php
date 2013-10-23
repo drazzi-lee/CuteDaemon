@@ -21,11 +21,11 @@ if(!ini_get('date.timezone')){
 define('ENVIRONMENT', 'development');
 //define('ENVIRONMENT', 'production');
 
-define('CUTEDAEMON_ROOT', __DIR__);
+define('CUTEDAEMON_ROOT', dirname(dirname(__FILE__)));
 define('CUTEDAEMON_SRC', CUTEDAEMON_ROOT . DIRECTORY_SEPARATOR . 'src');
 
-define('TASK_DAILY_PATH', __DIR__ . '/task/periodic/daily/');
-define('TASK_REPETITIVE_PATH', __DIR__ . '/task/periodic/repetitive/');
+define('TASK_DAILY_PATH', CUTEDAEMON_ROOT. '/task/periodic/daily/');
+define('TASK_REPETITIVE_PATH', CUTEDAEMON_ROOT . '/task/periodic/repetitive/');
 
 function load($namespace){
 	$splitpath = explode('\\', $namespace);
