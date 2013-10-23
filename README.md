@@ -12,3 +12,13 @@ will run another 10 times if you restart the service.
 
 - This project is incomplete, may cause some unexpected exception like server going down becauseof memory exhausted. Please make
 sure you have already test it on your development server before you run it on a production environment.
+
+##How To Use
+	1.###Run as service###
+		sudo /path/to/cutedaemon -s
+		sudo service cutedaemon start
+	2.###Run as daemon###
+		sudo /path/to/cutedaemon -d
+	3.###Get help###
+		sudo /path/to/cutedaemon
+
