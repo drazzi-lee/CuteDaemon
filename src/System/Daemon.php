@@ -82,8 +82,6 @@ class Daemon
      */
     const LOG_DEBUG = 7;
 
-
-
     /**
      * The current process identifier
      *
@@ -1107,7 +1105,7 @@ class Daemon
             // Maybe the command to write an init.d file was issued.
             // In such a case it's important to echo failures to the
             // STDOUT
-            echo $log_line . "\n";
+			echo $log_line . "\n";
             $log_echoed = true;
             // but still try to also log to file for future reference
         }
@@ -1246,7 +1244,10 @@ class Daemon
      */
     static public function isInBackground()
     {
-        return self::$_processIsChild && self::isRunning();
+        //return self::$_processIsChild && self::isRunning();
+        return self::$_processIsChild; 
+		//for fix bug: when service stoped, the child process logging will
+		//display on screen unexpectely. drazzi-lee drazzi.lee@gmail.com
     }
 
     /**
