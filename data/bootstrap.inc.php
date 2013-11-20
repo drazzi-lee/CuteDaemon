@@ -21,12 +21,15 @@ if(!ini_get('date.timezone')){
 define('ENVIRONMENT', 'development');
 //define('ENVIRONMENT', 'production');
 
+define('PHP_BIN', '/usr/bin/php');
+
 define('CUTEDAEMON_ROOT', dirname(dirname(__FILE__)));
 define('CUTEDAEMON_SRC', CUTEDAEMON_ROOT . DIRECTORY_SEPARATOR . 'src');
 
 define('TASK_DAILY_PATH', CUTEDAEMON_ROOT. '/task/periodic/daily/');
 define('TASK_REPETITIVE_PATH', CUTEDAEMON_ROOT . '/task/periodic/repetitive/');
 define('TASK_RUNNING_FILE', dirname(__FILE__) . DIRECTORY_SEPARATOR . . 'runningTasks');
+
 
 function load($namespace){
 	$splitpath = explode('\\', $namespace);

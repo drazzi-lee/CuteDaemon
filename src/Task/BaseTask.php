@@ -80,7 +80,7 @@ abstract class BaseTask{
 				$output = array();
 
 				$this->attachRunning();
-  				exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
+  				exec( PHP_BIN. ' -q ' . $this->phpScript . ' 2>&1', $output);
 				$this->detachRunning();	
 
 				Daemon::Log(Daemon::LOG_INFO, "[{$this->taskName}] child process end.\n");
