@@ -34,7 +34,7 @@ class RepetitiveTask extends BaseTask{
 		$this->setTaskFrom($taskFile);
 		$this->setScript($this->taskFrom);
 		
-		$configFile = dirname(realpath($taskFile)).'/config.ini';
+		$configFile = dirname($taskFile).'/config.ini';
 		$taskFileName = basename($taskFile, '.php');
 		$this->taskName = 'RepetitiveTask::'.$taskFileName;
 
