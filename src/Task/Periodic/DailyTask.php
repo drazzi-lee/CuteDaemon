@@ -21,7 +21,7 @@ class DailyTask extends BaseTask{
 	private $configRepeatDisable = array();
 
 	private static $validWeek = array(
-			"Mon","Tue","Web","Thu","Fri","Sat","Sun"
+			"Mon","Tue","Wed","Thu","Fri","Sat","Sun"
 			);
 
 	private static $validMonth = array(
