@@ -18,11 +18,6 @@ abstract class BaseTask{
 	protected $phpScript;
 
 	/**
-	 * Flag whether the task is running.
-	 */
-	protected $isRunning = FALSE;
-
-	/**
 	 * Last run time, Unix timestamp parse.
 	 */
 	protected $lastRun;
@@ -66,13 +61,11 @@ abstract class BaseTask{
 	 * Run the task, it will callback when it comes to end.
 	 */
 	public function run($callback = null){
-		if(!$this->isRunning){
+		if(!$this->isRunning()){
 			/**
 			 * 2>&1 : This will cause the stderr ouput of a program to be
 			 * 			written to the same filedescriptor than stdout.
 			 * &>	: This will place every output of a program to a file. 
-			 *
-			 * @TODO Need to fork a child process.
 			 */
 			$this->lastRun = time();
 			$pid = pcntl_fork();
@@ -86,17 +79,66 @@ abstract class BaseTask{
 			} else {
 				$output = array();
 
-				$this->isRunning = TRUE;
+				$this->attachRunning();
   				exec('/usr/bin/php -q ' . $this->phpScript . ' 2>&1', $output);
-				$this->isRunning = FALSE;	
+				$this->detachRunning();	
 
 				Daemon::Log(Daemon::LOG_INFO, "[{$this->taskName}] child process end.\n");
-				$this->isRunning = FALSE;	
 
 				if(is_callable($callback)){
 					call_user_func_array($callback, array($this, $output));
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Check the task is running or not.
+	 *  
+	 *  @return boolean;
+	 */
+	protected function isRunning(){
+		$runningList = $this->getRunning();
+		return in_array($this->taskFrom, $runningList);
+	}
+	
+	/**
+	 *  Assign the current task is running to file.
+	 *  
+	 *  @return the number of bytes that were written to the file, or FALSE on failure
+	 */
+	protected function attachRunning(){
+		$runningList = array();
+		if(file_exists(TASK_RUNNING_FILE)){
+			$runningList = json_decode(file_get_contents(TASK_RUNNING_FILE));
+		}
+		array_push($runningList, $this->taskFrom);
+		return file_put_contents(TASK_RUNNING_FILE, json_encode($runningList));
+	}
+	
+	/**
+	 *  Detach the current task from running list.
+	 *  
+	 *  @return the number of bytes that were written to the file, or FALSE on failure
+	 */
+	protected function detachRunning(){
+		$runningList = $this->getRunning();
+		if(($key = array_search($this->taskFrom, $runningList)) !== false) {
+			unset($runningList[$key]);
+		}		
+		return file_put_contents(TASK_RUNNING_FILE, json_encode($runningList));
+	}
+	
+	/**
+	 *  Get Running task List.
+	 *  
+	 *  @return array
+	 */
+	protected function getRunning(){
+		$runningList = array();
+		if(file_exists(TASK_RUNNING_FILE)){
+			$runningList = json_decode(file_get_contents(TASK_RUNNING_FILE));
+		}
+		return $runningList;
 	}
 }
