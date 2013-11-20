@@ -139,6 +139,9 @@ abstract class BaseTask{
 		if(file_exists(TASK_RUNNING_FILE)){
 			$runningList = json_decode(file_get_contents(TASK_RUNNING_FILE));
 		}
+		if($runningList == null){
+			$runningList = array();
+		}
 		return $runningList;
 	}
 }
